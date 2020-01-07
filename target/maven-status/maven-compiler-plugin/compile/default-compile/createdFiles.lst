@@ -1,4 +1,5 @@
-org\airtel\ug\prometheusapp\MetricResource.class
-org\airtel\ug\prometheusapp\RestConfig.class
-org\airtel\ug\prometheusapp\Client.class
-org\airtel\ug\prometheusapp\BusinessLogic.class
+org/airtel/ug/prometheusapp/RestConfig.class
+org/airtel/ug/prometheusapp/RequestSimulatorBean.class
+org/airtel/ug/prometheusapp/BusinessLogic.class
+org/airtel/ug/prometheusapp/MetricResource.class
+org/airtel/ug/prometheusapp/Client.class

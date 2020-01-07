@@ -1,5 +1,6 @@
 package org.airtel.ug.prometheusapp;
 
+import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import java.util.Random;
 import javax.annotation.PostConstruct;
@@ -8,8 +9,9 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class BusinessLogic {
 
-    private Gauge total_transactions_processed;
-    private Gauge total_product_decrements;
+    private Counter processed_transactions_total;
+    private Gauge product_decrements_shillings;
+    //private Summary method_calls_response_seconds;
 
     private static final String BILLING_OPTIONS[] = {"airtime", "airtel_money"};
 
@@ -45,47 +47,65 @@ public class BusinessLogic {
     @PostConstruct
     private void initMetricInfo() {
 
-        total_transactions_processed = Gauge
+            processed_transactions_total = Counter
                 .build()
-                .name("total_transactions_processed")
+                .name("processed_transactions_total")
                 .help("Total transactions processed")
                 .labelNames("type")
                 .register();
 
-        total_product_decrements = Gauge
+        product_decrements_shillings = Gauge
                 .build()
-                .name("total_decrements")
+                .name("product_decrements_shillings")
                 .help("total decrements made per product")
                 .labelNames("product", "billingoption", "type")
                 .register();
 
         //init the gauges for the products
         for (String product : VOICE_PRODUCTS) {
-            total_product_decrements.labels(product, "airtel_money", "voice").set(0);
-            total_product_decrements.labels(product, "airtime", "voice").set(0);
+            product_decrements_shillings.labels(product, "airtel_money", "data").set(0);
+            product_decrements_shillings.labels(product, "airtime", "data").set(0);
         }
 
+//        method_calls_response_seconds = Summary
+//                .build()
+//                .name("external_method_calls_latency_seconds")
+//                .help("amount of time it takes to send and read response from calls made to externa systems.")
+//                .labelNames("method")
+//                .register();
     }
 
     public String sayHello() {
-        total_transactions_processed.labels("voice").inc();
+
+        //Timer startTimer = method_calls_response_seconds.labels("helloMethod").startTimer();
+        processed_transactions_total.labels("data").inc();
 
         //randomly choose a procduct
         Random random = new Random();
         int billing_option_choice = Math.abs(random.nextInt(2));
         String product = VOICE_PRODUCTS[Math.abs(random.nextInt(VOICE_PRODUCTS.length - 1))];
 
-        total_product_decrements.labels(product, BILLING_OPTIONS[billing_option_choice], "voice").inc(Math.abs(random.nextInt(100)));
+        product_decrements_shillings.labels(product, BILLING_OPTIONS[billing_option_choice], "data").inc(Math.abs(random.nextInt(100)));
+        //product_decrements_shillings.labels(product, BILLING_OPTIONS[billing_option_choice], "data").inc(1000);
 
+//        try {
+//            int sleep_time = Math.abs(random.nextInt(1000));
+//            System.out.println("Sleeping for " + sleep_time + " millis.");
+//            Thread.sleep(sleep_time);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(BusinessLogic.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+        //startTimer.observeDuration();
         return "Hello there!";
     }
 
     public String resetAllGauges() {
-        total_transactions_processed.labels("voice").set(0);
+        //processed_transactions_total.labels("data").set(0);
 
         for (String product : VOICE_PRODUCTS) {
-            total_product_decrements.labels(product, "airtel_money", "voice").set(0);
-            total_product_decrements.labels(product, "airtime", "voice").set(0);
+            product_decrements_shillings.labels(product, "airtel_money", "data").set(0);
+            product_decrements_shillings.labels(product, "airtime", "data").set(0);
         }
 
         return "Resetting gauges complete!";
